@@ -7,7 +7,7 @@ services:
 
   postgresql:
      restart: always
-     hostname: 'postgresql'
+     hostname: '#hostname'
      image: postgres:latest
      environment:
        POSTGRES_USER: "gitlab"
@@ -18,27 +18,27 @@ services:
 
   gitlab:
     restart: always
-    hostname: 'skara.ru'
+    hostname: '#hostname'
     image: gitlab/gitlab-ce:13.5.4-ce.0
     environment:
        GITLAB_OMNIBUS_CONFIG: |
          postgresql['enable'] = false
          gitlab_rails['db_username'] = "gitlab"
          gitlab_rails['db_password'] = "secret"
-         gitlab_rails['db_host'] = "postgresql"
+         gitlab_rails['db_host'] = "#DBhostname"
          gitlab_rails['db_database'] = "gitlabhq_production"
          redis['enable'] = false
          gitlab_rails['redis_host'] = 'redis'
          gitlab_rails['redis_port'] = '6379'
          # REGISTRY
-         external_url "http://skara.ru"
+         external_url "http://company.url"
          registry['enable'] = true
-         registry_external_url "http://skara.ru:5001"
-         gitlab_rails['registry_host'] = "http://skara.ru"
+         registry_external_url "http://company.url:port"
+         gitlab_rails['registry_host'] = "http://company.url"
          registry_nginx['listen_port'] = 5001
          registry_nginx['listen_https'] = false
          registry_nginx['redirect_http_to_https'] = false
-         #registry_nginx['proxy_set_headers'] = {"X-Forwarded-Proto" => "https","X-Forwarded-Ssl" => "on", "Host" => "http://skara.ru"}
+         #registry_nginx['proxy_set_headers'] = {"X-Forwarded-Proto" => "https","X-Forwarded-Ssl" => "on", "Host" => "http://company.url"}
          # GITLAB
          gitlab_rails['registry_enabled'] = true
          gitlab_rails['registry_issuer'] = "omnibus-gitlab-issuer"

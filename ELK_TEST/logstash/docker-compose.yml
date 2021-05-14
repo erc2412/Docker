@@ -1,0 +1,22 @@
+version: "3.8"
+services: 
+  logstash:
+    image: logstash:7.12.0
+    container_name: logstash
+    hostname: logstash
+    restart: always
+    ports:
+      - 5044:5044
+      - 9600:9600
+    volumes:
+      - ./config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./pipeline:/usr/share/logstash/pipeline
+    network_mode: host
+#    networks:
+#      - elk_stack
+#    depends_on:
+#      - es01
+
+#networks:
+#  elk_stack:
+#    driver: bridge

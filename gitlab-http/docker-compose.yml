@@ -1,0 +1,83 @@
+#--
+version: '3.5'
+services:
+  redis:
+    restart: always
+    image: redis:latest
+
+  postgresql:
+     restart: always
+     hostname: '#hostname'
+     image: postgres:latest
+     environment:
+       POSTGRES_USER: "gitlab"
+       POSTGRES_PASSWORD: "secret"
+       POSTGRES_DB: "gitlabhq_production"
+     volumes:
+       - postgres:/var/lib/postgresql/data:Z
+
+  gitlab:
+    restart: always
+    hostname: '#hostname'
+    image: gitlab/gitlab-ce:13.5.4-ce.0
+    environment:
+       GITLAB_OMNIBUS_CONFIG: |
+         postgresql['enable'] = false
+         gitlab_rails['db_username'] = "gitlab"
+         gitlab_rails['db_password'] = "secret"
+         gitlab_rails['db_host'] = "#DBhostname"
+         gitlab_rails['db_database'] = "gitlabhq_production"
+         redis['enable'] = false
+         gitlab_rails['redis_host'] = 'redis'
+         gitlab_rails['redis_port'] = '6379'
+         # REGISTRY
+         external_url "http://company.url"
+         registry['enable'] = true
+         registry_external_url "http://company.url:port"
+         gitlab_rails['registry_host'] = "http://company.url"
+         registry_nginx['listen_port'] = 5001
+         registry_nginx['listen_https'] = false
+         registry_nginx['redirect_http_to_https'] = false
+         #registry_nginx['proxy_set_headers'] = {"X-Forwarded-Proto" => "https","X-Forwarded-Ssl" => "on", "Host" => "http://company.url"}
+         # GITLAB
+         gitlab_rails['registry_enabled'] = true
+         gitlab_rails['registry_issuer'] = "omnibus-gitlab-issuer"
+#         gitlab_rails['registry_path'] = "/mnt/registry"
+    ports:
+      - '5001:5001'
+      - '80:80'
+      - '10022:22'
+    volumes:
+      - gitlab_config:/etc/gitlab:Z
+      - gitlab_backup:/var/opt/gitlab/backups:Z
+#      - registry:/mnt/registry:Z
+
+volumes:
+  postgres:
+    driver: local
+    driver_opts:
+      type: none
+      device: /srv/postgres
+      o: bind
+
+  gitlab_config:
+    driver: local
+    driver_opts:
+      type: none
+      device: /srv/gitlab_config
+      o: bind
+
+  gitlab_backup:
+    driver: local
+    driver_opts:
+      type: none
+      device: /srv/gitlab_backup
+      o: bind
+
+#  registry:
+#     driver: local
+#     driver_opts:
+#	type: none
+#	device: /srv/registry
+#	o: bind
+

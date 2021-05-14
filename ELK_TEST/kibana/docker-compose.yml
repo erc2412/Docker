@@ -7,6 +7,10 @@ services:
     ports:
       - 5601:5601
     volumes:
+<<<<<<< HEAD
       - ./config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+=======
+      - ./config/kibana.yml:/usr/share/kibana/config/kibana.yml
+>>>>>>> 2b59df72751cbe41f6085b6c7e0644b0cb519b8b
       - /etc/localtime:/etc/localtime:ro
     network_mode: host

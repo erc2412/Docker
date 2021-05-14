@@ -27,7 +27,15 @@ xpack.monitoring.enabled: true
 #xpack.security.transport.ssl.enabled: true
 xpack.monitoring.collection.enabled: true
 
+<<<<<<< HEAD
 #xpack.license.self_generated.type: "trial"
+=======
+#x-pack security
+#xpack.monitoring.enabled: "true"
+#xpack.security.enabled: "true"
+#xpack.security.transport.ssl.enabled: "true"
+xpack.monitoring.collection.enabled: "true"
+>>>>>>> 2b59df72751cbe41f6085b6c7e0644b0cb519b8b
 
 
 #------------disabled------------------

@@ -1,6 +1,5 @@
 version: "3.8"
 services:
-
   kibana:
     image: kibana:7.12.0
     container_name: kibana

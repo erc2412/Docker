@@ -12,11 +12,4 @@ services:
       - ./config/logstash.yml:/usr/share/logstash/config/logstash.yml
       - ./pipeline:/usr/share/logstash/pipeline
     network_mode: host
-#    networks:
-#      - elk_stack
-#    depends_on:
-#      - es01
 
-#networks:
-#  elk_stack:
-#    driver: bridge

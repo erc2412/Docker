@@ -1,11 +1,17 @@
 ---
+#----------node--------------
 server.name: "kibana"
 server.host: "0.0.0.0"
+#----------------------------
+
+#------settings_for_es-------
 elasticsearch.hosts: [ "http://es01:9200", "http://es02:9200", "http://es03:9200" ]
 elasticsearch.username: "elastic"
 elasticsearch.password: "QWE123qwe"
+#----------------------------
+
+#--------x-pack--------------
+#xpack.security.enabled: true
+#----------------------------
 
 
-#----x pack-----
-
-monitoring.enabled: true

@@ -1,4 +1,4 @@
-version: "3.8"
+version: "2"
 services: 
   logstash:
     image: logstash:7.12.0
@@ -9,14 +9,6 @@ services:
       - 5044:5044
       - 9600:9600
     volumes:
-      - ./config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
       - ./pipeline:/usr/share/logstash/pipeline
     network_mode: host
-#    networks:
-#      - elk_stack
-#    depends_on:
-#      - es01
-
-#networks:
-#  elk_stack:
-#    driver: bridge

@@ -1,17 +1,12 @@
-version: "3.8"
+version: "2"
 services:
-
   kibana:
     image: kibana:7.12.0
     container_name: kibana
     restart: always
     ports:
       - 5601:5601
-#    depends_on:
-#      - es01
     volumes:
-      - "./config/kibana.yml:/usr/share/kibana/config/kibana.yml"
+      - ./config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
       - /etc/localtime:/etc/localtime:ro
     network_mode: host
-#    networks:
-#      - elk_stack

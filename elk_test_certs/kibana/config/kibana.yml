@@ -1,0 +1,21 @@
+---
+#----------node--------------
+server.name: "kibana"
+server.host: "0.0.0.0"
+#----------------------------
+
+#------settings_for_es-------
+elasticsearch.hosts: [ "http://es01.local:9200", "http://es02.local:9200", "http://es03.local:9200" ]
+elasticsearch.username: "elastic"
+elasticsearch.password: "QWE123qwe"
+#----------------------------
+
+#-----x-pack_security--------
+#xpack.security.enabled: true
+server.ssl.enabled: true
+server.ssl.certificate: /usr/share/elasticsearch/config/certificates/es01.crt
+server.ssl.key: /usr/share/elasticsearch/config/certificates/es01.key
+elasticsearch.ssl.certificateAuthorities: [ "/usr/share/elasticsearch/config/certificates/ca.crt" ]
+#----------------------------
+
+

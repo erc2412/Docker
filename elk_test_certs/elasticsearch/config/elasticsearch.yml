@@ -1,0 +1,48 @@
+---
+#-------------network------------------
+network.host: 0.0.0.0
+#--------------------------------------
+
+#------------node_settings-------------
+node.name: es01
+network.publish_host: 10.10.10.87
+#--------------------------------------
+
+#-----------cluster_settings-----------
+cluster.name: "elk"
+discovery.seed_hosts: [ "es01", "es02", "es03" ]
+discovery.zen.minimum_master_nodes: 2
+
+#--- uncomment_only_on_first_run-------
+#cluster.initial_master_nodes: [ "es01", "es02", "es03" ]
+#--------------------------------------
+
+#------------memory--------------------
+bootstrap.memory_lock: true
+indices.memory.index_buffer_size: 30%
+#--------------------------------------
+
+#------------x-pack--------------------
+#This deprecated setting has no effect
+xpack.monitoring.enabled: true
+#--------------------------------------
+xpack.monitoring.collection.enabled: true
+#xpack.license.self_generated.type: "trial"
+
+
+#------------disabled------------------
+#discovery.type: single-node
+#--------------------------------------
+
+#----------x-pack_security-------------
+xpack.security.enabled: true
+xpack.security.http.ssl.enabled: false
+xpack.security.transport.ssl.enabled: true
+#xpack.security.http.ssl.key: /usr/share/elasticsearch/config/certificates/es01.key
+#xpack.security.http.ssl.certificate: /usr/share/elasticsearch/config/certificates/es01.crt
+#xpack.security.http.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca.crt
+xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certificates/es01.key
+xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certificates/es01.crt
+xpack.security.transport.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca.crt
+xpack.security.transport.ssl.verification_mode: certificate
+#---------------------------------------

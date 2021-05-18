@@ -12,7 +12,3 @@ services:
       - ./config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
       - ./pipeline:/usr/share/logstash/pipeline
     network_mode: host
-<<<<<<< HEAD
-=======
-
->>>>>>> 2b59df72751cbe41f6085b6c7e0644b0cb519b8b

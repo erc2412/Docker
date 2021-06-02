@@ -1,0 +1,38 @@
+---
+  - name: Check servers
+    ping:
+
+  - name: Check number of nodes in the cluster
+    shell: "curl -XGET -s -m 2 --user {{ es_logpass }} '{{ es_host }}:{{ es_port }}/_cat/nodes?h=name' | wc -l"
+    register: nodes_count
+
+  - name: Turn off shard reallocation
+    shell: 'curl -H "Content-Type: application/json" --user {{ es_logpass }} -XPUT "{{ es_host }}:{{ es_port }}/_cluster/settings" -d "{\"persistent\":{\"cluster.routing.allocation.enable\": \"none\" }}"'
+    register: response
+    failed_when: response.stdout.find('"acknowledged":true') == -1
+
+  - name: Stop the elasticsearch service
+    shell: "cd {{ es_home }} && docker-compose down"
+
+  - name: Start the elasticsearch service
+    shell: "cd {{ es_home }} && docker-compose up -d"
+
+  - name: Wait for the node to rejoin the cluster
+    shell: "curl -XGET -s -m 2 --user {{ es_logpass}} '{{ es_host}}:{{ es_port}}/_cat/nodes?h=name' | wc -l"
+    register: new_nodes
+    until: new_nodes.stdout == nodes_count.stdout
+    retries: 200
+    delay: 3
+
+  - name: Turn on shard allocation
+    shell: 'curl -H "Content-Type: application/json" --user {{ es_logpass }} -XPUT "{{ es_host }}:{{ es_port }}/_cluster/settings" -d "{\"persistent\":{\"cluster.routing.allocation.enable\": \"all\" }}"'
+    register: response
+    failed_when: response.stdout.find('"acknowledged":true') == -1
+
+  - name: Wait until cluster status is green
+    shell: "curl --user {{ es_logpass }}  -XGET '{{ es_host }}:{{ es_port }}/_cluster/health'"
+    register: response
+    until: response.stdout.find('"status":"green"') != -1
+    retries: 100
+    delay: 10
+

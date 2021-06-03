@@ -1,0 +1,4 @@
+[stag_serv]
+testvm1    ansible_host=10.10.10.86
+testvm2    ansible_host=10.10.10.85
+	

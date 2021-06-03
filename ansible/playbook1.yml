@@ -1,0 +1,6 @@
+---
+- name: test_connect
+  hosts: all
+
+  roles:
+    - es_restart

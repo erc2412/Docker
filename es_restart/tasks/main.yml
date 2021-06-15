@@ -26,7 +26,6 @@
       chdir: "{{ es_home }}"
     shell: "docker-compose up -d"
 
-
   - name: Wait for the node to rejoin the cluster
     shell: "curl -XGET -s -m 2 -u {{ es_logpass}} '{{ es_host}}:{{ es_port}}/_cat/nodes?h=name' | wc -l"
     register: new_nodes

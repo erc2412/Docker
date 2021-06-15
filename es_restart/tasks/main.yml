@@ -3,29 +3,44 @@
     ping:
 
   - name: Check number of nodes in the cluster
-    shell: "curl -XGET -s -m 2 --user {{ es_logpass }} '{{ es_host }}:{{ es_port }}/_cat/nodes?h=name' | wc -l"
+    shell: "curl -XGET -s -m 2 -u {{ es_logpass }} '{{ es_host }}:{{ es_port }}/_cat/nodes?h=name' | wc -l"
     register: nodes_count
 
-  - name: Turn off shard reallocation
-    shell: 'curl -H "Content-Type: application/json" --user {{ es_logpass }} -XPUT "{{ es_host }}:{{ es_port }}/_cluster/settings" -d "{\"persistent\":{\"cluster.routing.allocation.enable\": \"none\" }}"'
+  - name: Turn off persistent shard reallocation
+    shell: 'curl -H "Content-Type: application/json" -u {{ es_logpass }} -XPUT "{{ es_host }}:{{ es_port }}/_cluster/settings" -d "{\"persistent\":{\"cluster.routing.allocation.enable\": \"none\" }}"'
+    register: response
+    failed_when: response.stdout.find('"acknowledged":true') == -1
+
+  - name: Turn off transient shard reallocation
+    shell: 'curl -H "Content-Type: application/json" -u {{ es_logpass }} -XPUT "{{ es_host }}:{{ es_port }}/_cluster/settings" -d "{\"transient\":{\"cluster.routing.allocation.enable\": \"none\" }}"'
     register: response
     failed_when: response.stdout.find('"acknowledged":true') == -1
 
   - name: Stop the elasticsearch service
-    shell: "cd {{ es_home }} && docker-compose down"
-
+    args:
+      chdir: "{{ es_home }}"
+    shell: "docker-compose down"
+  
   - name: Start the elasticsearch service
-    shell: "cd {{ es_home }} && docker-compose up -d"
+    args:
+      chdir: "{{ es_home }}"
+    shell: "docker-compose up -d"
+
 
   - name: Wait for the node to rejoin the cluster
-    shell: "curl -XGET -s -m 2 --user {{ es_logpass}} '{{ es_host}}:{{ es_port}}/_cat/nodes?h=name' | wc -l"
+    shell: "curl -XGET -s -m 2 -u {{ es_logpass}} '{{ es_host}}:{{ es_port}}/_cat/nodes?h=name' | wc -l"
     register: new_nodes
     until: new_nodes.stdout == nodes_count.stdout
     retries: 200
     delay: 3
 
-  - name: Turn on shard allocation
-    shell: 'curl -H "Content-Type: application/json" --user {{ es_logpass }} -XPUT "{{ es_host }}:{{ es_port }}/_cluster/settings" -d "{\"persistent\":{\"cluster.routing.allocation.enable\": \"all\" }}"'
+  - name: Turn on persistent shard allocation
+    shell: 'curl -H "Content-Type: application/json" -u {{ es_logpass }} -XPUT "{{ es_host }}:{{ es_port }}/_cluster/settings" -d "{\"persistent\":{\"cluster.routing.allocation.enable\": \"all\" }}"'
+    register: response
+    failed_when: response.stdout.find('"acknowledged":true') == -1
+
+  - name: Turn off transient shard reallocation
+    shell: 'curl -H "Content-Type: application/json" -u {{ es_logpass }} -XPUT "{{ es_host }}:{{ es_port }}/_cluster/settings" -d "{\"transient\":{\"cluster.routing.allocation.enable\": \"all\" }}"'
     register: response
     failed_when: response.stdout.find('"acknowledged":true') == -1
 

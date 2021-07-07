@@ -28,56 +28,31 @@
 
 #-----------MAKE_DIRECTORY_TAKS------------------
 
-- name: Creates scripts directory
+- name: Creates directories
   ansible.builtin.file:
-    path: "{{ es_scripts }}"
+    path: "{{ item.path }}"
     state: directory
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+  loop:
+    - { path: "{{ es_scripts }}", owner: 'admin', group: 'root' }
+    - { path: "{{ es_curator }}", owner: 'admin', group: 'root' }
+    - { path: "{{ es_app }}", owner: 'admin', group: 'root' }
+    - { path: "{{ es_logs }}", owner: 'admin', group: 'root' }
+    - { path: "{{ es_curator_logs }}", owner: 'admin', group: 'root' }
   when: "update == false and scripts_elastic.stat.exists == false and 'elasticsearch_hosts' in group_names"
-
-- name: Creates curator directory
-  ansible.builtin.file:
-    path: "{{ es_curator }}"
-    state: directory
-  when: "update == false and scripts_elastic.stat.exists == false and 'elasticsearch_hosts' in group_names and inventory_hostname == node_name1"
-
-- name: Creates curator logs directory
-  ansible.builtin.file:
-    path: "{{ es_curator_logs }}"
-    state: directory
-  when: "update == false and scripts_elastic.stat.exists == false and 'elasticsearch_hosts' in group_names and inventory_hostname == node_name1"
-
-- name: Creates /APP/docker/elasticsearch directory
-  ansible.builtin.file:
-    path: "{{ es_app }}"
-    state: directory
-#   owner: 1000
-#   group: root
-  when: "update == false and app_elastic.stat.exists == false and 'elasticsearch_hosts' in group_names"
-
-- name: Creates /LOGS/docker/elasticsearch directory
-  ansible.builtin.file:
-    path: "{{ es_logs }}"
-    state: directory
-#   owner: 1000
-#   group: root
-  when: "update == false and logs_elastic.stat.exists == false and 'elasticsearch_hosts' in group_names"
 
 #---------------COPY_ES_CONFIGS------------------
 
-- name: copy es config file to nodes
+- name: copy es configs to nodes
   copy:
-    src: "{{ src_es_conf }}"
-    dest: "{{ dst_es_conf }}"
-    owner: admin
-    group: admin
-  when: "'elasticsearch_hosts' in group_names and update == false"
-
-- name: copy es compose file to nodes
-  copy:
-    src: "{{ src_es_dc }}"
-    dest: "{{ dst_es_dc }}"
-    owner: admin
-    group: admin
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+  loop:
+    - { src: "{{ src_es_conf }}", dest: "{{  dst_es_conf }}", owner: 'admin', group: 'admin' }
+    - {	src: "{{ src_es_dc }}", dest: "{{  dst_es_dc }}", owner: 'admin', group: 'admin' }
   when: "'elasticsearch_hosts' in group_names and update == false"
 
 #===============CHANGE_ES_CONFIGS==================
@@ -85,93 +60,38 @@
 #---------------DOCKER_COMPOSE---------------------
 - name: change container_name
   lineinfile:
-   destfile: "{{ dst_compose }}"
-   regexp: "container_name:"
-   line: "container_name: '{{ container_name }}'"
+   destfile: "{{ item.destfile }}"
+   regexp: "{{ item.regexp }}"
+   line: "{{ item.line }}"
+  loop:
+    - { destfile: "{{ dst_compose }}", regexp: "container_name:", line: "container_name: '{{ container_name }}'" }
+    - {	destfile: "{{ dst_compose }}", regexp: "image:", line: "image: docker.elastic.co/elasticsearch/elasticsearch:{{ version }}" }
   when: "'elasticsearch_hosts' in group_names and update == false"
-
-- name: change version
-  lineinfile:
-   destfile: "{{ dst_compose }}"
-   regexp: "image:"
-   line: "image: docker.elastic.co/elasticsearch/elasticsearch:{{ version }}"
-  when: "update == true and 'elasticsearch_hosts' in group_names or update == false and 'elasticsearch_hosts' in group_names"
 
 #--------------ES_CONFIG----------------------------
 
-- name: change cluster_name
-  lineinfile:
-   destfile: "{{ dst_config }}"
-   regexp: "cluster.name:"
-   line: "cluster.name: {{ cluster_name }}"
+- name: Change elastic config
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: admin
+    group: admin
+  with_items:
+    - { src: 'templates/elasticsearch.yml.j2', dest: '{{ dst_config }}' }
   when: "'elasticsearch_hosts' in group_names and update == false"
-
-- name: change discovery_seed_hosts
-  lineinfile:
-   destfile: "{{ dst_config }}"
-   regexp: "discovery.seed_hosts:"
-   line: 'discovery.seed_hosts: ["{{ node_name1 }}", "{{ node_name2 }}", "{{ node_name3 }}"]'
-  when: "'elasticsearch_hosts' in group_names and update == false"
-
-- name: change node_name on host1
-  lineinfile:
-   destfile: "{{ dst_config }}"
-   regexp: "node.name:"
-   line: "node.name: {{ node_name1 }}"
-  when: "'elasticsearch_hosts' in group_names and update == false and inventory_hostname == node_name1"
-
-- name: change node_name on host2
-  lineinfile:
-   destfile: "{{ dst_config }}"
-   regexp: "node.name:"
-   line: "node.name: {{ node_name2 }}"
-  when: "'elasticsearch_hosts' in group_names and update == false and inventory_hostname == node_name2"
-
-- name: change node_name on host3
-  lineinfile:
-   destfile: "{{ dst_config }}"
-   regexp: "node.name:"
-   line: "node.name: {{ node_name3 }}"
-  when: "'elasticsearch_hosts' in group_names and update == false and inventory_hostname == node_name3"
-
-- name: change network_publish_host on host1
-  lineinfile:
-   destfile: "{{ dst_config }}"
-   regexp: "network.publish_host:"
-   line: "network.publish_host: {{ node_name1 }}"
-  when: "'elasticsearch_hosts' in group_names and update == false and inventory_hostname == node_name1"
-
-- name: change network_publish_host on host2
-  lineinfile:
-   destfile: "{{ dst_config }}"
-   regexp: "network.publish_host:"
-   line: "network.publish_host: {{ node_name2 }}"
-  when: "'elasticsearch_hosts' in group_names and update == false and inventory_hostname == node_name2"
-
-- name: change network_publish_host on host3
-  lineinfile:
-   destfile: "{{ dst_config }}"
-   regexp: "network.publish_host:"
-   line: "network.publish_host: {{ node_name3 }}"
-  when: "'elasticsearch_hosts' in group_names and update == false and inventory_hostname == node_name3"
 
 #---------------INSTALL_CURATOR---------------------
 
-- name: copy curator sh config to hosts
+- name: copy curator configs to hosts
   copy:
-    src: "{{ src_es_curator_sh }}"
-    dest: "{{ dst_es_curator_sh }}"
-    owner: admin
-    group: admin
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+  loop:
+    - { src: "{{ src_es_curator_sh }}", dest: "{{ dst_es_curator_sh }}", owner: 'admin', group: 'admin' }
+    - { src: "{{ src_es_curator_conf }}", dest: "{{ dst_es_curator_conf }}", owner: 'admin', group: 'admin' }
   when: "'elasticsearch_hosts' in group_names and update == false and inventory_hostname == node_name1"
-
-- name: copy curator config to hosts
-  copy:
-    src: "{{ src_es_curator_conf }}"
-    dest: "{{ dst_es_curator_conf }}"
-    owner: admin
-    group: admin
-  when: "'elasticsearch_hosts' in group_names and update == false and inventory_hostname == node_name1"  
 
 - name: add sh job to cron"
   ansible.builtin.cron:
@@ -196,19 +116,15 @@
      state: present
   when: "'elasticsearch_hosts' in group_names and update == false"
 
-- name: copy telegraf config to hosts
+- name: copy telegraf configs to hosts
   copy:
-    src: "{{ src_telegraf_conf }}"
-    dest: "{{ dst_telegraf_conf }}"
-    owner: admin
-    group: admin
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+  loop:
+    - { src: "{{ src_telegraf_conf }}", dest: "{{ dst_telegraf_conf }}", owner: 'admin', group: 'admin' }
+    - { src: "{{ src_telegraf_d }}", dest: "{{ dst_telegraf_d }}", owner: 'admin', group: 'admin' }
   when: "'elasticsearch_hosts' in group_names and update == false"
 
-- name: copy telegraf config to hosts
-  copy:
-    src: "{{ src_telegraf_d }}"
-    dest: "{{ dst_telegraf_d }}"
-    owner: admin
-    group: admin
-  when: "'elasticsearch_hosts' in group_names and update == false"
 

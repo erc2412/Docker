@@ -9,15 +9,15 @@ update: false
 
 #------------------TELEGRAF-----------------------------
 telegraf_version: 1.19.0-1
-
+retry_join: "{% for host in groups['elasticsearch_hosts'] %}\"{{ hostvars[inventory_hostname].ansible_hostname }}\"{% endfor %}"
 #------------------COMPOSE_VARS-------------------------
-container_name: es01_bibas
+container_name: es01_bibas_with_loop
 version: 7.20.0
 #mem_limit: 5g
 
 #------------------CONFIG_VARS--------------------------
-cluster_name: bibas_cluster
-node_name1: testvm1
+cluster_name: bibas_cluster_with_loop
+node_name1: inventory_hostname
 node_name2: testvm2
 node_name3: biba3
 

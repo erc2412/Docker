@@ -1,0 +1,56 @@
+---
+
+#-----------ELASTICSEARCH---------------
+- name: include vars
+  include_vars:
+    file: /home/admin/ansible/es_new_claster/defaults/elastic.yml
+
+- name: copy es config file to nodes
+  copy:
+    src: "{{ src_es_conf }}" 
+    dest: "{{ dst_es_conf }}" 
+    owner: admin
+    group: admin
+
+- name: copy es compose file to nodes
+  copy:
+    src: "{{ src_es_dc }}"
+    dest: "{{ dst_es_dc }}"
+    owner: admin
+    group: admin
+
+#--------------KIBANA--------------------
+
+- name: copy kibana config file to nodes
+  copy:
+    src: "{{ src_kb_conf }}" 
+    dest: "{{ dst_kb_conf }}"
+    owner: admin
+    group: admin
+
+- name: copy kibana compose file to nodes
+  copy:
+    src: "{{ src_kb_dc }}" 
+    dest: "{{ dst_kb_dc }}"
+    owner: admin
+    group: admin
+
+#-------------LOGSTASH--------------------
+
+- name: copy kibana config file to nodes
+  copy:
+    src: "{{ src_kb_conf }}"
+    dest: "{{ dst_kb_conf }}"
+    owner: admin
+    group: admin
+
+- name: copy kibana compose file to nodes
+  copy:
+    src: "{{ src_kb_dc }}"
+    dest: "{{ dst_kb_dc }}"
+    owner: admin
+    group: admin
+
+#--------------TELEGRAF-------------------
+
+#--------------CURATOR--------------------

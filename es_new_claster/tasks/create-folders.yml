@@ -1,0 +1,62 @@
+---
+# tasks for create folder
+
+- name: Creates scripts directory
+  ansible.builtin.file:
+    path: /home/admin/SCRIPTS/elasticsearch
+    state: directory
+
+- name: Creates kibana directory
+  ansible.builtin.file:
+    path: /home/admin/SCRIPTS/kibana
+    state: directory
+
+- name: Creates logstash directory
+  ansible.builtin.file:
+    path: /home/admin/SCRIPTS/logstash
+    state: directory
+  when: "ls_host1 in inventory_hostname"
+
+- name: Creates /APP/docker/elasticsearch directory
+  ansible.builtin.file:
+    path: /APP/docker/elasticsearch
+    state: directory
+#   owner: 1000
+#   group: root
+
+- name: Creates /APP/kibana directory
+  ansible.builtin.file:
+    path: /APP/docker/kibana 
+    state: directory
+#   owner: 1000     
+#   group: root
+
+- name:	Creates	/APP/docker/logstash directory
+  ansible.builtin.file:
+    path: /APP/docker/logstash
+    state: directory
+#    owner: 1000
+#    group: root
+  when: "ls_host1 in inventory_hostname"
+
+- name: Creates /LOGS/docker/elasticsearch directory
+  ansible.builtin.file:
+    path: /LOGS/docker/elasticsearch
+    state: directory
+#   owner: 1000     
+#   group: root
+
+- name: Creates /LOGS/kibana directory
+  ansible.builtin.file:
+    path: /LOGS/docker/kibana
+    state: directory
+#    owner: 1000     
+#    group: root
+
+- name: Creates /LOGS/logstash directory
+  ansible.builtin.file:
+    path: /LOGS/logstash
+    state: directory
+#    owner: 1000
+#    group: root 
+  when: "ls_host1 in inventory_hostname"

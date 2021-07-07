@@ -1,0 +1,66 @@
+---
+
+#===========CREATE_FOLDERS_VARS==============
+#params for create-folders.yml
+#all params in create-folders.yml
+
+
+#=============COPY-CONFIGS===================
+#params for copy-config.yml
+
+#==============SRC_PATH======================
+
+#-------------ELASTICSEARCH------------------
+src_es_conf: es_configs/elasticsearch/config
+src_es_dc: es_configs/elasticsearch/docker-compose.yml
+
+#---------------KIBANA-----------------------
+src_kb_conf: es_configs/kibana/config
+src_kb_dc: es_configs/kibana/docker-compose.yml
+
+#---------------LOGSTASH---------------------
+src_ls_conf: es_configs/logstash/config
+src_ls_dc: es_configs/logstash/docker-compose.yml
+
+#---------------FILEBEAT---------------------
+src_fb_conf: filebeat/filebeat.yml
+
+#---------------CURATOR----------------------
+src_curator_conf: curator/conf.conf
+
+#---------------TELEGRAF---------------------
+src_telegraf_soft: telegraf/telegraf-1.19.0-1.x86_64.rpm
+src_telegraf_conf: telegraf/telegraf.conf
+src_telegraf_docker_conf: telegraf/telegraf.d/docker.conf
+ 
+#===============DST_PATH=====================
+
+#-------------ELASTICSEARCH------------------
+dst_es_conf: /APP/docker/elasticsearch/config
+dst_es_dc: /home/admin/SCRIPTS/elasticsearch
+dst_es_logs: /LOGS/docker/elasticsearch
+#---------------KIBANA-----------------------
+dst_kb_conf: /APP/docker/kibana/config
+dst_kb_dc: /home/admin/SCRIPTS/kibana
+
+#---------------LOGSTASH---------------------
+dst_ls_conf: /APP/docker/logstash/config
+dst_ls_dc: /home/admin/logstash
+
+#--------------FILEBEAT----------------------
+dst_fb_conf: /APP/filebeat
+
+#--------------CURATOR-----------------------
+dst_consul_conf: /home/admin/SCRIPTS/curator
+
+#--------------TELEGRAF----------------------
+dst_telegraf_soft: /home/admin/SCRIPTS
+dst_telegraf_conf: /etc/telegraf
+dst_telegraf_docker_conf: /etc/telegraf/telegraf.d
+
+
+host1: testvm1
+host2: testvm2
+
+
+#jvm.options

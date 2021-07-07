@@ -1,0 +1,14 @@
+filebeat:
+  inputs:
+    -
+      paths:
+        - /var/log/messages
+      type: log
+      fields_under_root: true
+      fields:
+        index: messages
+
+output.logstash:
+  enabled: true
+  hosts: ["10.10.10.87:5044"]
+        

@@ -1,0 +1,20 @@
+---
+# task for change-config-files
+#config for first cluster
+
+- name: Updating the config file to allow outside access
+  lineinfile:
+   destfile: /home/admin/SCRIPTS/kibana/docker-compose.yml
+   regexp: 'container_name:'
+   line: 'container_name: kibana_test1'
+  when: 
+    - "'stag_serv' in group_names"   
+
+#config for second cluster
+#- name: Updating the config file to allow outside access
+#  lineinfile:
+#   destfile: /home/admin/SCRIPTS/kibana/docker-compose.yml
+#   regexp: 'container_name:'
+#   line: 'container_name: kibana_test2'
+#  when: "host2 in inventory_hostname"
+

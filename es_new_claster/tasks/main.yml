@@ -1,0 +1,24 @@
+---
+# tasks file for es_new_claster
+
+- name: install elasticsearch
+  include: elasticsearch.yml
+  tags: elastic
+
+#- name: install kibana
+#  include: kibana.yml
+#  tags: kibana
+
+#- name: install logstash
+#  include: logstash.yml
+#  tags: logstash
+
+#- name: install curator
+#  include: curator.yml
+#   tags: curator
+
+#- name: install telegraf
+#  include: telegraf.yml
+#   tags: telegraf
+
+

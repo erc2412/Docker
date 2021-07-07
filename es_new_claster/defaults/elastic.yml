@@ -1,0 +1,47 @@
+---
+#all vars for eslasticsearch.yml
+#for update elastic change update on "true"
+#for new install chachge update on "false"
+#==================VARS_FOR_CHANGE======================
+update: false
+#https://dl.influxdata.com/telegraf/releases/telegraf-1.19.0-1.x86_64.rpm change on your rep
+
+
+#------------------TELEGRAF-----------------------------
+telegraf_version: 1.19.0-1
+
+#------------------COMPOSE_VARS-------------------------
+container_name: es01_bibas
+version: 7.20.0
+#mem_limit: 5g
+
+#------------------CONFIG_VARS--------------------------
+cluster_name: bibas_cluster
+node_name1: testvm1
+node_name2: testvm2
+node_name3: biba3
+
+#----------------DIRECTORY_FOR_CREATE-------------------
+es_scripts: /home/admin/SCRIPTS/elasticsearch
+es_app: /APP/docker/elasticsearch
+es_logs: /LOGS/docker/elasticsearch
+es_curator: /home/admin/SCRIPTS/curator
+es_curator_logs: /LOGS/docker/curator
+
+#----------------SRC_CONFIG_PATH------------------------
+src_es_conf: es_configs/elasticsearch/config
+src_es_dc: es_configs/elasticsearch/docker-compose.yml
+src_es_curator_sh: curator/conf.sh
+src_es_curator_conf: curator/curator
+src_telegraf_conf: telegraf/telegraf.conf
+src_telegraf_d: telegraf/telegraf.d
+#--------------DST_CONFIG_PATH--------------------------
+dst_es_conf: /APP/docker/elasticsearch
+dst_es_dc: /home/admin/SCRIPTS/elasticsearch
+dst_es_curator_sh: /home/admin/SCRIPTS/curator
+dst_es_curator_conf: /APP/docker
+dst_telegraf_conf: /etc/telegraf
+dst_telegraf_d: /etc/telegraf
+#--------------DST_CONFIGS_FOR_CHANGES------------------
+dst_compose: /home/admin/SCRIPTS/elasticsearch/docker-compose.yml
+dst_config: /APP/docker/elasticsearch/config/elasticsearch.yml

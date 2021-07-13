@@ -1,0 +1,6 @@
+- name: restart cluster
+  serial: 1
+  hosts: all
+
+  roles:
+    - es_restart

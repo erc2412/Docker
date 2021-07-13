@@ -1,0 +1,64 @@
+---
+  - name: Check number of nodes in the cluster
+    shell: "curl -XGET -s -m 2 -u {{ es_logpass }} '{{ es_host }}:{{ es_port }}/_cat/nodes?h=name' | wc -l"
+    register: nodes_count
+    args:
+      warn: no
+
+  - name: Turn off persistent shard reallocation
+    shell: 'curl -H "Content-Type: application/json" -u {{ es_logpass }} -XPUT "{{ es_host }}:{{ es_port }}/_cluster/settings" -d "{\"persistent\":{\"cluster.routing.allocation.enable\": \"none\" }}"'
+    register: response
+    failed_when: response.stdout.find('"acknowledged":true') == -1
+    args:
+      warn: no
+
+  - name: Turn off transient shard reallocation
+    shell: 'curl -H "Content-Type: application/json" -u {{ es_logpass }} -XPUT "{{ es_host }}:{{ es_port }}/_cluster/settings" -d "{\"transient\":{\"cluster.routing.allocation.enable\": \"none\" }}"'
+    register: response
+    failed_when: response.stdout.find('"acknowledged":true') == -1
+    args:
+      warn: no
+
+  - name: Stop the elasticsearch service
+    args:
+      chdir: "{{ es_home }}"
+    shell: "docker-compose down"
+
+  - name: Start the elasticsearch service
+    args:
+      chdir: "{{ es_home }}"
+    shell: "docker-compose up -d"
+
+
+  - name: Wait for the node to rejoin the cluster
+    shell: "curl -XGET -s -m 2 -u {{ es_logpass}} '{{ es_host}}:{{ es_port}}/_cat/nodes?h=name' | wc -l"
+    register: new_nodes
+    until: new_nodes.stdout == nodes_count.stdout
+    args:
+      warn: no
+    retries: 200
+    delay: 3
+
+
+  - name: Turn on persistent shard allocation
+    shell: 'curl -H "Content-Type: application/json" -u {{ es_logpass }} -XPUT "{{ es_host }}:{{ es_port }}/_cluster/settings" -d "{\"persistent\":{\"cluster.routing.allocation.enable\": \"all\" }}"'
+    register: response
+    failed_when: response.stdout.find('"acknowledged":true') == -1
+    args:
+      warn: no
+
+  - name: Turn off transient shard reallocation
+    shell: 'curl -H "Content-Type: application/json" -u {{ es_logpass }} -XPUT "{{ es_host }}:{{ es_port }}/_cluster/settings" -d "{\"transient\":{\"cluster.routing.allocation.enable\": \"all\" }}"'
+    register: response
+    failed_when: response.stdout.find('"acknowledged":true') == -1
+    args:
+      warn: no
+
+  - name: Wait until cluster status is green
+    shell: "curl --user {{ es_logpass }}  -XGET '{{ es_host }}:{{ es_port }}/_cluster/health'"
+    register: response
+    until: response.stdout.find('"status":"green"') != -1
+    args:
+      warn: no
+    retries: 100
+    delay: 10
